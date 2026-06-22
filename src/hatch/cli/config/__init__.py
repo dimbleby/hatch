@@ -61,7 +61,7 @@ def set_value(app, key, value):
     """
     from fnmatch import fnmatch
 
-    import tomlkit
+    import tomlrt
 
     from hatch.config.model import ConfigurationError, RootConfig
     from hatch.config.utils import create_toml_document, save_toml_document
@@ -74,7 +74,7 @@ def set_value(app, key, value):
     if setting_project_location and not value.startswith("~"):
         value = os.path.abspath(value)
 
-    user_config = new_config = tomlkit.parse(app.config_file.read())
+    user_config = new_config = tomlrt.loads(app.config_file.read())
 
     data = [value]
     data.extend(reversed(key.split(".")))
@@ -111,19 +111,6 @@ def set_value(app, key, value):
 
     branch_config[key] = new_config[key] = value
 
-    # https://github.com/sdispater/tomlkit/issues/48
-    if new_config.__class__.__name__ == "Table":  # no cov
-        table_body = getattr(new_config.value, "body", [])
-        possible_whitespace = table_body[-2:]
-        if len(possible_whitespace) == 2:  # noqa: PLR2004
-            for key, item in possible_whitespace:
-                if key is not None:
-                    break
-                if item.__class__.__name__ != "Whitespace":
-                    break
-            else:
-                del table_body[-2]
-
     try:
         RootConfig(user_config).parse_fields()
     except ConfigurationError as e:
@@ -146,4 +133,4 @@ def set_value(app, key, value):
     from rich.syntax import Syntax
 
     app.display_success("New setting:")
-    app.output(Syntax(tomlkit.dumps(document).rstrip(), "toml", background_color="default"))
+    app.output(Syntax(tomlrt.dumps(document).rstrip(), "toml", background_color="default"))

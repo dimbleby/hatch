@@ -449,17 +449,17 @@ class Project:
         return self._raw_config
 
     def save_config(self, config):
-        import tomlkit
+        import tomlrt
 
-        with open(str(self._project_file_path), "w", encoding="utf-8") as f:
-            f.write(tomlkit.dumps(config))
+        with open(str(self._project_file_path), "wb") as f:
+            tomlrt.dump(config, f)
 
     @staticmethod
     def initialize(project_file_path, template_config):
-        import tomlkit
+        import tomlrt
 
-        with open(str(project_file_path), encoding="utf-8") as f:
-            raw_config = tomlkit.parse(f.read())
+        with open(str(project_file_path), "rb") as f:
+            raw_config = tomlrt.load(f)
 
         build_system_config = raw_config.setdefault("build-system", {})
 
@@ -496,5 +496,5 @@ class Project:
         version_config.clear()
         version_config["path"] = f"{template_config['package_name']}/__init__.py"
 
-        with open(str(project_file_path), "w", encoding="utf-8") as f:
-            f.write(tomlkit.dumps(raw_config))
+        with open(str(project_file_path), "wb") as f:
+            tomlrt.dump(raw_config, f)
