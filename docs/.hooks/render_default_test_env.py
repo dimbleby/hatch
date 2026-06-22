@@ -4,7 +4,7 @@ import os
 from ast import literal_eval
 from functools import cache
 
-import tomlkit
+import tomlrt
 from markdown.preprocessors import Preprocessor
 
 MARKER_DEPENDENCIES = "<HATCH_TEST_ENV_DEPENDENCIES>"
@@ -25,27 +25,21 @@ def test_env_config():
 @cache
 def get_dependencies_toml():
     env_config = {"dependencies": test_env_config()["dependencies"]}
-    content = tomlkit.dumps({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}}).strip()
-
-    # Reload to fix the long array
-    config = tomlkit.loads(content)
-    config["tool"]["hatch"]["envs"]["hatch-test"]["dependencies"].multiline(True)
-
-    # Reduce indentation
-    content = tomlkit.dumps(config).strip()
-    return content.replace('    "', '  "')
+    config = tomlrt.Document({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}})
+    config["tool"]["hatch"]["envs"]["hatch-test"]["dependencies"].set_multiline(multiline=True, indent=2)
+    return tomlrt.dumps(config).strip()
 
 
 @cache
 def get_matrix_toml():
     env_config = {"matrix": test_env_config()["matrix"]}
-    return tomlkit.dumps({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}}).strip()
+    return tomlrt.dumps({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}}).strip()
 
 
 @cache
 def get_scripts_toml():
     env_config = {"scripts": test_env_config()["scripts"]}
-    return tomlkit.dumps({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}}).strip()
+    return tomlrt.dumps({"tool": {"hatch": {"envs": {"hatch-test": env_config}}}}).strip()
 
 
 class TestEnvDefaultsPreprocessor(Preprocessor):

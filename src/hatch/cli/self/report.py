@@ -73,7 +73,7 @@ def report(app: Application, *, no_open: bool) -> None:
     from textwrap import indent
     from urllib.parse import quote_plus
 
-    import tomlkit
+    import tomlrt
 
     from hatch._version import __version__
     from hatch.utils.toml import load_toml_data
@@ -118,7 +118,7 @@ def report(app: Application, *, no_open: bool) -> None:
 ### Configuration
 
 ```toml
-{tomlkit.dumps(relevant_config).rstrip()}
+{tomlrt.dumps(relevant_config).rstrip()}
 ```
 """
 
